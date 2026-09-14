@@ -35,5 +35,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ai-radar
-          path: ai-radar.zip
+          name: "ai-radar-${GITHUB_SHA::7}"
+          path: "ai-radar-${GITHUB_SHA::7}.zip"
