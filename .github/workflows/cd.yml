@@ -1,0 +1,39 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest
+
+      - name: Create artifact
+        run: |
+          zip -r ai-radar.zip . \
+            -x ".git/*" \
+            ".venv/*" \
+            "__pycache__/*" \
+            ".pytest_cache/*"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-radar
+          path: ai-radar.zip
