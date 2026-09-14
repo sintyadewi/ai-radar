@@ -25,15 +25,20 @@ jobs:
         run: python -m pytest
 
       - name: Create artifact
+        id: package
         run: |
-          zip -r ai-radar.zip . \
+          artifact_name="ai-radar-${GITHUB_SHA::7}"
+
+          zip -r "${artifact_name}.zip" . \
             -x ".git/*" \
             ".venv/*" \
             "__pycache__/*" \
             ".pytest_cache/*"
 
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: "ai-radar-${GITHUB_SHA::7}"
-          path: "ai-radar-${GITHUB_SHA::7}.zip"
+          name: "${{ steps.package.outputs.artifact_name }}"
+          path: "${{ steps.package.outputs.artifact_name }}.zip"
