@@ -1,0 +1,44 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest
+
+      - name: Create artifact
+        id: package
+        run: |
+          artifact_name="ai-radar-${GITHUB_SHA::7}"
+
+          zip -r "${artifact_name}.zip" . \
+            -x ".git/*" \
+            ".venv/*" \
+            "__pycache__/*" \
+            ".pytest_cache/*"
+
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: "${{ steps.package.outputs.artifact_name }}"
+          path: "${{ steps.package.outputs.artifact_name }}.zip"
